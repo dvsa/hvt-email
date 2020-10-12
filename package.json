@@ -1,8 +1,7 @@
 {
-  "name": "dvsa-lambda-starter",
+  "name": "hvt-email",
   "version": "1.0.0",
-  "description": "A package to act as a starter for typescript lambdas",
-  "main": "index.js",
+  "description": "A lambda that sends a confirmation email to an ATF when they update their availability.",
   "scripts": {
     "lint": "eslint '*/**/*.ts' --quiet --fix",
     "lint:ci": "eslint '*/**/*.ts'",
@@ -10,15 +9,15 @@
     "test:ci": "jest --ci",
     "build:dev": "NODE_ENV=development webpack-cli",
     "start:dev": "sam local start-api",
-    "invoke": "sam local invoke"
+    "invoke": "sam local invoke ConfirmationLambda -e events/event.json"
   },
-  "constributers": [
+  "constributors": [
     {
-      "name": "Shaun Hare",
-      "email": "shaun.hare@dvsa.gov.uk"
+      "name": "Sam Artuso",
+      "email": "s.artuso@kainos.com"
     }
   ],
-  "license": "MIT",
+  "license": "UNLICENSED",
   "dependencies": {
     "aws-sdk": "^2.747.0"
   },
