@@ -1,7 +1,9 @@
 const path = require('path');
 const AwsSamPlugin = require('aws-sam-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const awsSamPlugin = new AwsSamPlugin({ vscodeDebug: false });
+const lambdaName = 'ConfirmationLambda'; // must correspond to lambda name in template.yml
 
 module.exports = {
   // Loads the entry object from the AWS::Serverless::Function resources in your
@@ -40,5 +42,12 @@ module.exports = {
   },
 
   // Add the AWS SAM Webpack plugin
-  plugins: [awsSamPlugin]
+  plugins: [
+    awsSamPlugin,
+    new CopyPlugin({
+      patterns: [
+        { from: './.env', to: `.aws-sam/build/${lambdaName}/` },
+      ],
+    }),
+  ]
 };

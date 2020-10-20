@@ -1,0 +1,123 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import qs from 'querystring';
+import AWS from 'aws-sdk';
+import { Template } from 'nunjucks';
+import { format } from 'light-date';
+
+import { Logger } from '../util/logger';
+import { Availability, TokenPair } from '../types';
+
+export const LINK_PREFIX = 'http://localhost/?'; // TODO - work this out
+
+interface BuildEmailBodyParams {
+  availableTemplate: Template,
+  fullyBookedTemplate: Template,
+  atfName: string,
+  availability: Availability,
+  tokens: TokenPair,
+}
+
+export const buildEmailBody = (params: BuildEmailBodyParams): string => {
+  const { availability } = params;
+
+  const template = availability.isAvailable
+    ? params.availableTemplate
+    : params.fullyBookedTemplate;
+  const linkTemplateTag = availability
+    ? 'no_link'
+    : 'yes_link';
+  const tokenKey = availability ? 'no' : 'yes';
+  const link = `${LINK_PREFIX}${qs.stringify({ jwt: params.tokens[`${tokenKey}`] })}`;
+
+  const startDate = new Date(availability.startDate); // TODO: validate dates
+  const endDate = new Date(availability.endDate);
+
+  // TODO: Why on Earth is the linter erroneously complaining?
+  // eslint-disable-next-line
+  return template.render({
+    atf_name: params.atfName,
+    additional_open_date_start: format(startDate, '{dd}/{MM}/{yyyy}'),
+    additional_open_date_end: format(endDate, '{dd}/{MM}/{yyyy}'),
+    [linkTemplateTag]: link,
+  });
+};
+
+export const EMAIL_TEMPLATE = 'GOVNOTIFYTEMPLATE';
+export const EMAIL_SUBJECT = 'ATF Availability Confirmation';
+
+interface BuildSQSMessageParams {
+  queueUrl: string,
+  atfId: string,
+  atfEmail: string,
+  templateValues: {
+    atfName: string,
+    tokens: TokenPair,
+    availableTemplate: Template,
+    fullyBookedTemplate: Template,
+    availability: Availability,
+  }
+}
+
+export interface EmailMessageRequest {
+  id: string,
+  message: AWS.SQS.SendMessageRequest,
+}
+
+export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequest => {
+  const emailBody = buildEmailBody(params.templateValues);
+  return {
+    id: 'FIXME',
+    message: {
+      QueueUrl: params.queueUrl,
+      MessageBody: emailBody,
+      MessageAttributes: {
+        templateId: {
+          DataType: 'String',
+          StringValue: EMAIL_TEMPLATE,
+        },
+        messageType: {
+          DataType: 'String',
+          StringValue: 'Email',
+        },
+        recipient: {
+          DataType: 'String',
+          StringValue: params.atfEmail,
+        },
+        subject: {
+          DataType: 'String',
+          StringValue: EMAIL_SUBJECT,
+        },
+      },
+    },
+  };
+};
+
+interface EnqueueEmailMessagesRequest {
+  emailMessages: EmailMessageRequest[],
+  awsRegion: string,
+  logger: Logger,
+}
+
+export const enqueueEmailMessages = async (params: EnqueueEmailMessagesRequest): Promise<void> => {
+  const { emailMessages, awsRegion, logger } = params;
+  const sqs = new AWS.SQS({
+    region: awsRegion,
+    apiVersion: '2012-11-05',
+  });
+
+  const promises = emailMessages.map((req) => sqs.sendMessage(req.message).promise()
+    .then(() => ({ atfId: req.id, result: 'success' }))
+    .catch(() => ({ atfId: req.id, result: 'failure' })));
+
+  const results = await Promise.all(promises);
+
+  const successful = results.filter((job) => job.result === 'success').map(({ atfId }) => atfId);
+  const failed = results.filter((job) => job.result === 'failure').map(({ atfId }) => atfId);
+
+  if (promises.length === successful.length) {
+    logger.info('All emails enqueued successfully.');
+  } else {
+    logger.warn(`Could not enqueue emails for the following ATFs: ${failed.join(', ')}`);
+  }
+  logger.info(`Messages processed: ${promises.length}, successful: ${successful.length}, failed: ${failed.length}.`);
+};

@@ -16,6 +16,12 @@
           "id": {
             "S": "7db12eed-0c3f-4d27-8221-5699f4e3ea22"
           },
+          "name": {
+            "S": "Derby Cars Ltd."
+          },
+          "email": {
+            "S": "hello@email.com"
+          },
           "availability": {
             "M": {
               "isAvailable": {
@@ -31,11 +37,27 @@
                 "S": "2020-10-06T14:21:45.000Z"
               }
             }
+          },
+          "tokens": {
+            "M": {
+              "yes": {
+                "S": "eyJhbGciOiJIUzI1Ni..."
+              },
+              "no": {
+                "S": "eyJhbGciOiJIUzI1Ni..."
+              }
+            }
           }
         },
         "OldImage": {
           "id": {
             "S": "7db12eed-0c3f-4d27-8221-5699f4e3ea22"
+          },
+          "name": {
+            "S": "Derby Cars Ltd."
+          },
+          "email": {
+            "S": "hello@email.com"
           },
           "availability": {
             "M": {
@@ -50,6 +72,16 @@
               },
               "startDate": {
                 "S": "2020-10-06T14:21:45.000Z"
+              }
+            }
+          },
+          "tokens": {
+            "M": {
+              "yes": {
+                "S": "eyJhbGciOiJIUzI1Ni..."
+              },
+              "no": {
+                "S": "eyJhbGciOiJIUzI1Ni..."
               }
             }
           }
