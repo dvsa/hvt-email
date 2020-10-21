@@ -4,6 +4,7 @@ interface Config {
   availableEmailTemplateS3Object: string,
   fullyBookedEmailTemplateS3Object: string,
   queueUrl: string,
+  emailLinkBaseUrl: string,
 }
 
 export const getConfig = (): Config => {
@@ -13,6 +14,7 @@ export const getConfig = (): Config => {
     'AVAILABLE_EMAIL_TEMPLATE_S3_OBJECT',
     'FULLY_BOOKED_EMAIL_TEMPLATE_S3_OBJECT',
     'SQS_QUEUE_URL',
+    'EMAIL_LINK_BASE_URL',
   ].forEach((envVar) => {
     if (!process.env[`${envVar}`]) {
       throw new Error(`Environment variable ${envVar} seems to be missing.`);
@@ -24,5 +26,6 @@ export const getConfig = (): Config => {
     availableEmailTemplateS3Object: process.env.AVAILABLE_EMAIL_TEMPLATE_S3_OBJECT,
     fullyBookedEmailTemplateS3Object: process.env.FULLY_BOOKED_EMAIL_TEMPLATE_S3_OBJECT,
     queueUrl: process.env.SQS_QUEUE_URL,
+    emailLinkBaseUrl: process.env.EMAIL_LINK_BASE_URL,
   };
 };

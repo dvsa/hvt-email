@@ -59,6 +59,7 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
         queueUrl: config.queueUrl,
         atfId: availabilityData.id,
         atfEmail: availabilityData.email,
+        emailLinkBaseUrl: config.emailLinkBaseUrl,
         templateValues: {
           atfName: availabilityData.name,
           tokens: availabilityData.tokens,

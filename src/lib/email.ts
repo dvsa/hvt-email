@@ -6,14 +6,13 @@ import { format } from 'light-date';
 import { Logger } from '../util/logger';
 import { Availability, TokenPair } from '../types';
 
-export const LINK_PREFIX = 'http://localhost/?'; // TODO - work this out
-
 interface BuildEmailBodyParams {
   availableTemplate: Template,
   fullyBookedTemplate: Template,
   atfName: string,
   availability: Availability,
   tokens: TokenPair,
+  emailLinkBaseUrl: string,
 }
 
 export const buildEmailBody = (params: BuildEmailBodyParams): string => {
@@ -27,7 +26,7 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
     : 'yes_link';
   const tokenKey = availability ? 'no' : 'yes';
   // eslint-disable-next-line security/detect-object-injection
-  const link = `${LINK_PREFIX}${qs.stringify({ jwt: params.tokens[tokenKey] })}`;
+  const link = `${params.emailLinkBaseUrl}?${qs.stringify({ jwt: params.tokens[tokenKey] })}`;
 
   const startDate = new Date(availability.startDate);
   const endDate = new Date(availability.endDate);
@@ -47,13 +46,7 @@ interface BuildSQSMessageParams {
   queueUrl: string,
   atfId: string,
   atfEmail: string,
-  templateValues: {
-    atfName: string,
-    tokens: TokenPair,
-    availableTemplate: Template,
-    fullyBookedTemplate: Template,
-    availability: Availability,
-  }
+  templateValues: BuildEmailBodyParams,
 }
 
 export interface EmailMessageRequest {

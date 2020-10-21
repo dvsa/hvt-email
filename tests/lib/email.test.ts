@@ -31,6 +31,7 @@ const tokens = {
 };
 const startDate = new Date(2020, 9, 21, 12, 0, 0).toISOString();
 const endDate = new Date(2020, 9, 27, 12, 0, 0).toISOString();
+const emailLinkBaseUrl = 'http://localhost/';
 
 describe('buildEmailBody()', () => {
   const availableTemplateRender = jest.fn();
@@ -61,6 +62,7 @@ describe('buildEmailBody()', () => {
       atfName,
       availability,
       tokens,
+      emailLinkBaseUrl,
     });
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -70,7 +72,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21/10/2020',
       additional_open_date_end: '27/10/2020',
-      no_link: `http://localhost/?jwt=${tokens.no}`,
+      no_link: `${emailLinkBaseUrl}?jwt=${tokens.no}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(fullyBookedTemplate.render).toHaveBeenCalledTimes(0);
@@ -90,6 +92,7 @@ describe('buildEmailBody()', () => {
       atfName,
       availability,
       tokens,
+      emailLinkBaseUrl,
     });
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -99,7 +102,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21/10/2020',
       additional_open_date_end: '27/10/2020',
-      no_link: `http://localhost/?jwt=${tokens.no}`,
+      no_link: `${emailLinkBaseUrl}?jwt=${tokens.no}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(availableTemplate.render).toHaveBeenCalledTimes(0);
@@ -135,6 +138,7 @@ describe('buildSqsMessage()', () => {
         availableTemplate,
         fullyBookedTemplate,
         availability,
+        emailLinkBaseUrl,
       },
     });
 
@@ -214,7 +218,9 @@ describe('enqueueEmailMessages()', () => {
     emailMessages.forEach((message, i) => {
       expect(awsSdkModuleMock.sqsSendMessageMock.mock.calls[i]).toEqual([message.message]);
     });
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(logger.info).toHaveBeenCalledTimes(2);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(logger.warn).toHaveBeenCalledTimes(0);
   });
 });
