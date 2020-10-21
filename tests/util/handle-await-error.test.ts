@@ -1,5 +1,7 @@
 import handle from '../../src/util/handle-await-error';
 
+jest.unmock('../../src/util/handle-await-error');
+
 describe('handle await error', () => {
   it('returns the value the promise resolves to if the promise is fulfilled', async () => {
     const expected = 123;

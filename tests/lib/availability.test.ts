@@ -1,44 +1,43 @@
-import type { DynamoDBRecord } from 'aws-lambda';
+import type { DynamoDBRecord, StreamRecord } from 'aws-lambda';
 
 import { extractAvailabilityData, availabilityHasChanged } from '../../src/lib/availability';
 
+import validEvent from '../mocks/dynamodb-stream-event.json';
+import eventWithInvalidEmail from '../mocks/invalid-dynamodb-stream-event-email.json';
+import eventWithInvalidAvailability from '../mocks/invalid-dynamodb-stream-event-availability.json';
+
+jest.unmock('../../src/lib/availability');
+jest.unmock('aws-sdk');
+jest.unmock('Joi');
+jest.unmock('deep-equal');
+
 describe('extractAvailabilityData()', () => {
   it('extracts the availability data as expected', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const yesToken = validEvent.NewImage.tokens.M.yes.S;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const noToken = validEvent.NewImage.tokens.M.no.S;
     const testCases = [
       {
         record: {
-          dynamodb: {
-            OldImage: {
-              availability: {
-                M: {
-                  isAvailable: { BOOL: true },
-                  lastUpdated: { S: '2020-10-09T12:31:46.518Z' },
-                  endDate: { S: '2020-11-03T14:21:45.000Z' },
-                  startDate: { S: '2020-10-06T14:21:45.000Z' },
-                },
-              },
-            },
-            NewImage: {
-              availability: {
-                M: {
-                  isAvailable: { BOOL: false },
-                  lastUpdated: { S: '2020-10-09T12:31:46.518Z' },
-                  endDate: { S: '2020-11-03T14:21:45.000Z' },
-                  startDate: { S: '2020-10-06T14:21:45.000Z' },
-                },
-              },
-            },
-          },
+          dynamodb: validEvent as StreamRecord,
         } as DynamoDBRecord,
         expected: {
+          id: '7db12eed-0c3f-4d27-8221-5699f4e3ea22',
+          name: 'Derby Cars Ltd.',
+          email: 'hello@email.com',
+          tokens: {
+            yes: yesToken,
+            no: noToken,
+          },
           oldAvailability: {
-            isAvailable: true,
+            isAvailable: false,
             lastUpdated: '2020-10-09T12:31:46.518Z',
             endDate: '2020-11-03T14:21:45.000Z',
             startDate: '2020-10-06T14:21:45.000Z',
           },
           newAvailability: {
-            isAvailable: false,
+            isAvailable: true,
             lastUpdated: '2020-10-09T12:31:46.518Z',
             endDate: '2020-11-03T14:21:45.000Z',
             startDate: '2020-10-06T14:21:45.000Z',
@@ -51,12 +50,36 @@ describe('extractAvailabilityData()', () => {
       expect(extractAvailabilityData(record)).toEqual(expected);
     });
   });
+
+  it('detects when the ATF is in an unexpected format', () => {
+    const testCase = {
+      record: {
+        dynamodb: eventWithInvalidEmail as StreamRecord,
+      } as DynamoDBRecord,
+    };
+
+    expect(() => {
+      extractAvailabilityData(testCase.record);
+    }).toThrowError();
+  });
+
+  it('detects when the availability data is in an unexpected format', () => {
+    const testCase = {
+      record: {
+        dynamodb: eventWithInvalidAvailability as StreamRecord,
+      } as DynamoDBRecord,
+    };
+
+    expect(() => {
+      extractAvailabilityData(testCase.record);
+    }).toThrowError();
+  });
 });
 
 describe('availabilityHasChanged()', () => {
   it('detects when availability has changed', () => {
     const testCases = [
-      // false > true
+      // false → true
       {
         oldAvailability: {
           lastUpdated: '2020-10-19T16:01:28.832Z',
@@ -71,7 +94,7 @@ describe('availabilityHasChanged()', () => {
           isAvailable: true,
         },
       },
-      // true > false
+      // true → false
       {
         oldAvailability: {
           lastUpdated: '2020-10-19T16:01:28.832Z',
@@ -86,7 +109,7 @@ describe('availabilityHasChanged()', () => {
           isAvailable: false,
         },
       },
-      // true > true, different dates
+      // true → true, different dates
       {
         oldAvailability: {
           lastUpdated: '2020-10-19T16:01:28.832Z',
@@ -101,7 +124,7 @@ describe('availabilityHasChanged()', () => {
           isAvailable: true,
         },
       },
-      // false > false, different dates
+      // false → false, different dates
       {
         oldAvailability: {
           lastUpdated: '2020-10-19T16:01:28.832Z',
@@ -123,7 +146,7 @@ describe('availabilityHasChanged()', () => {
     });
   });
 
-  it('detected when availability has not changed', () => {
+  it('detects when availability has not changed', () => {
     const testCases = [
       {
         oldAvailability: {

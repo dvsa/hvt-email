@@ -10,8 +10,8 @@ const atfSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   tokens: Joi.object({
-    yes: Joi.string().base64().required(),
-    no: Joi.string().base64().required(),
+    yes: Joi.string().required(),
+    no: Joi.string().required(),
   }),
 }).unknown(true);
 
@@ -23,8 +23,8 @@ const availabilitySchema = Joi.object({
 });
 
 export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityChangeData => {
-  const oldImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb?.OldImage);
-  const newImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb?.NewImage);
+  const oldImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.OldImage);
+  const newImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
 
   const newImageValResult = atfSchema.validate(newImage);
   if (newImageValResult.error || newImageValResult.errors) {
@@ -34,10 +34,10 @@ export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityCha
   const {
     id, name, email, tokens, availability: newAvailability,
   } = newImage;
-  const { oldAvailability } = oldImage;
+  const { availability: oldAvailability } = oldImage;
   const newAvailabilityValResult = availabilitySchema.validate(newAvailability);
   if (newAvailabilityValResult.error || newAvailabilityValResult.errors) {
-    throw new Error(`Malformed record: ${JSON.stringify(newImage)}`);
+    throw new Error(`Malformed "availability" field in: ${JSON.stringify(newImage)}`);
   }
 
   return {

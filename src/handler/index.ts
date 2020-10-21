@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import type { Context, DynamoDBStreamEvent } from 'aws-lambda';
 
+import { getConfig } from '../lib/config';
 import { availabilityHasChanged, extractAvailabilityData } from '../lib/availability';
 import { getEmailTemplates } from '../lib/get-email-template';
-import { getConfig } from '../lib/config';
+import { buildSQSMessage, enqueueEmailMessages, EmailMessageRequest } from '../lib/email';
 import handle from '../util/handle-await-error';
 import { createLogger, Logger } from '../util/logger';
 import { AvailabilityChangeData } from '../types';
-import { buildSQSMessage, enqueueEmailMessages, EmailMessageRequest } from '../lib/email';
 
 export const handler = async (event: DynamoDBStreamEvent, context: Context): Promise<void> => {
   const logger: Logger = createLogger(null, context);
@@ -71,11 +71,13 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
     }
   });
 
-  await enqueueEmailMessages({
-    emailMessages,
-    awsRegion: config.awsRegion,
-    logger,
-  });
+  if (emailMessages.length) {
+    await enqueueEmailMessages({
+      emailMessages,
+      awsRegion: config.awsRegion,
+      logger,
+    });
+  }
 
   logger.info('Confirmation email lambda done.');
 };

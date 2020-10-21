@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import qs from 'querystring';
 import AWS from 'aws-sdk';
-import { Template } from 'nunjucks';
+import type { Template } from 'nunjucks';
 import { format } from 'light-date';
 
 import { Logger } from '../util/logger';
@@ -27,13 +26,12 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
     ? 'no_link'
     : 'yes_link';
   const tokenKey = availability ? 'no' : 'yes';
-  const link = `${LINK_PREFIX}${qs.stringify({ jwt: params.tokens[`${tokenKey}`] })}`;
+  // eslint-disable-next-line security/detect-object-injection
+  const link = `${LINK_PREFIX}${qs.stringify({ jwt: params.tokens[tokenKey] })}`;
 
-  const startDate = new Date(availability.startDate); // TODO: validate dates
+  const startDate = new Date(availability.startDate);
   const endDate = new Date(availability.endDate);
 
-  // TODO: Why on Earth is the linter erroneously complaining?
-  // eslint-disable-next-line
   return template.render({
     atf_name: params.atfName,
     additional_open_date_start: format(startDate, '{dd}/{MM}/{yyyy}'),
@@ -59,14 +57,14 @@ interface BuildSQSMessageParams {
 }
 
 export interface EmailMessageRequest {
-  id: string,
+  atfId: string,
   message: AWS.SQS.SendMessageRequest,
 }
 
 export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequest => {
   const emailBody = buildEmailBody(params.templateValues);
   return {
-    id: 'FIXME',
+    atfId: params.atfId,
     message: {
       QueueUrl: params.queueUrl,
       MessageBody: emailBody,
@@ -106,8 +104,8 @@ export const enqueueEmailMessages = async (params: EnqueueEmailMessagesRequest):
   });
 
   const promises = emailMessages.map((req) => sqs.sendMessage(req.message).promise()
-    .then(() => ({ atfId: req.id, result: 'success' }))
-    .catch(() => ({ atfId: req.id, result: 'failure' })));
+    .then(() => ({ atfId: req.atfId, result: 'success' }))
+    .catch(() => ({ atfId: req.atfId, result: 'failure' })));
 
   const results = await Promise.all(promises);
 

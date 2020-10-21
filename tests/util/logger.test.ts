@@ -2,6 +2,9 @@ import type { APIGatewayProxyEvent, Context, APIGatewayEventRequestContext } fro
 import { v4 } from 'uuid';
 import { createLogger, Logger } from '../../src/util/logger';
 
+jest.unmock('uuid');
+jest.unmock('../../src/util/logger');
+
 describe('Test logger', () => {
   test('createLogger() via context lambdaId should return a logger object with the correct logFormat', () => {
     const queryStringParameters: Record<string, string> = { message: 'Hello world!' };
