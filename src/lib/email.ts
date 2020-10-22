@@ -83,13 +83,13 @@ export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequ
   };
 };
 
-interface EnqueueEmailMessagesRequest {
+interface EnqueueEmailMessagesRequestParams {
   emailMessages: EmailMessageRequest[],
   awsRegion: string,
   logger: Logger,
 }
 
-export const enqueueEmailMessages = async (params: EnqueueEmailMessagesRequest): Promise<void> => {
+export const enqueueEmailMessages = async (params: EnqueueEmailMessagesRequestParams): Promise<void> => {
   const { emailMessages, awsRegion, logger } = params;
   const sqs = new AWS.SQS({
     region: awsRegion,
