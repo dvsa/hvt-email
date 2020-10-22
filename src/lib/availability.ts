@@ -54,8 +54,11 @@ export const availabilityHasChanged = (
   oldAvailability: Availability | void,
   newAvailability: Availability | void,
 ): boolean => {
+  // This addresses the edge case where availability data was deleted. In this case we cannot rely
+  // on the deep equality check only.
+  // See discussion here: https://gitlab.motdev.org.uk/hvtesting/hvt-email/merge_requests/1#note_134209
   if (oldAvailability && !newAvailability) {
-    return false; // Availability data deleted for some reason. Stop here.
+    return false;
   }
   return !deepEqual(oldAvailability, newAvailability, { strict: true });
 };
