@@ -8,6 +8,7 @@
     "test": "jest --coverage",
     "test:ci": "jest --ci",
     "build:dev": "NODE_ENV=development webpack-cli",
+    "build:prod": "NODE_ENV=production webpack-cli",
     "start:dev": "sam local start-api",
     "invoke": "sam local invoke ConfirmationLambda -e events/event.json"
   },
