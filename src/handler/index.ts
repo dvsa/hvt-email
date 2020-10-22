@@ -73,11 +73,15 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
   });
 
   if (emailMessages.length) {
-    await enqueueEmailMessages({
+    const [err3] = await handle(enqueueEmailMessages({
       emailMessages,
       awsRegion: config.awsRegion,
       logger,
-    });
+    }));
+    if (err3) {
+      logger.error(`Error while enqueueing email message(s): ${err3.message}`);
+      throw err3;
+    }
   }
 
   logger.info('Confirmation email lambda done.');
