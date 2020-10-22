@@ -2,7 +2,6 @@ import type { APIGatewayProxyEvent, Context, APIGatewayEventRequestContext } fro
 import { v4 } from 'uuid';
 import { createLogger, Logger } from '../../src/util/logger';
 
-jest.unmock('uuid');
 jest.unmock('../../src/util/logger');
 
 describe('Test logger', () => {
@@ -18,7 +17,7 @@ describe('Test logger', () => {
     const logger: Logger = createLogger(eventMock, contextMock);
 
     expect(logger.logFormat).toBe(
-      `{"apiRequestId":"${apiRequestId}","correlationId":"${awsRequestId}","message":"%s"}`,
+      `{ "apiRequestId": "${apiRequestId}", "correlationId": "${awsRequestId}", "message": "%s" }`,
     );
   });
 
@@ -34,28 +33,9 @@ describe('Test logger', () => {
     const logger: Logger = createLogger(eventMock, contextMock);
 
     expect(logger.logFormat).toBe(
-      `{"apiRequestId":"${apiRequestId}","correlationId":"${headerCorrelationId}","message":"%s"}`,
+      `{ "apiRequestId": "${apiRequestId}", "correlationId": "${headerCorrelationId}", "message": "%s" }`,
     );
   });
-
-  test('createLogger() should set the correlationId to awsRequestId when invoked without an X-Correlation-Id header',
-    () => {
-      const queryStringParameters: Record<string, string> = {};
-      const apiRequestId: string = v4();
-      const requestContext: APIGatewayEventRequestContext = <APIGatewayEventRequestContext> { requestId: apiRequestId };
-      const headers: Record<string, string> = {}; // no headers
-      const eventMock: APIGatewayProxyEvent = <APIGatewayProxyEvent> { queryStringParameters, requestContext, headers };
-      const awsRequestId: string = v4();
-      const contextMock: Context = <Context> { awsRequestId };
-
-      const logger: Logger = createLogger(eventMock, contextMock);
-
-      expect(logger.logFormat).toBe(JSON.stringify({
-        apiRequestId,
-        correlationId: awsRequestId,
-        message: '%s',
-      }));
-    });
 
   test('logger.debug() calls console.debug() with expected parameters', () => {
     const logger: Logger = new Logger('', '');
