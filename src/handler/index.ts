@@ -40,6 +40,8 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
       return;
     }
 
+    logger.debug(`Processing record: ${JSON.stringify(record)}`);
+
     // Extract data from event
     let availabilityData: AvailabilityChangeData;
     try {
