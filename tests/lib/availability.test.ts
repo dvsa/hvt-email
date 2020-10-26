@@ -8,7 +8,7 @@ import eventWithInvalidAvailability from '../mocks/invalid-dynamodb-stream-event
 
 jest.unmock('../../src/lib/availability');
 jest.unmock('aws-sdk');
-jest.unmock('Joi');
+jest.unmock('joi');
 jest.unmock('deep-equal');
 
 describe('extractAvailabilityData()', () => {
