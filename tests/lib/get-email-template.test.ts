@@ -15,6 +15,8 @@ describe('getEmailTemplates()', () => {
 
   it('downloads both the "available" and the "fully booked" templates', async () => {
     const awsRegion = 'some-aws-region';
+    const endpoint = 'some-endpoint';
+    const forcePathStyle = true;
     const bucket = 'some-bucket';
     const availableTemplate = 'some-available-template';
     const fullyBookedTemplate = 'some-fully-booked-template';
@@ -24,12 +26,16 @@ describe('getEmailTemplates()', () => {
       bucket,
       availableTemplate,
       fullyBookedTemplate,
+      endpoint,
+      forcePathStyle,
     });
 
     expect(AWS.S3).toHaveBeenCalledTimes(1);
     expect(AWS.S3).toHaveBeenCalledWith({
       region: awsRegion,
       apiVersion: '2006-03-01',
+      endpoint,
+      s3ForcePathStyle: forcePathStyle,
     });
     expect(result).toHaveProperty('availableTemplate');
     expect(result.availableTemplate).toBeInstanceOf(Template);
@@ -68,7 +74,6 @@ describe('getEmailTemplate()', () => {
       s3,
       bucket,
       template: templateName,
-      awsRegion: 'eu-west-2',
     });
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
