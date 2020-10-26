@@ -22,6 +22,7 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
     bucket: config.emailTemplateS3Bucket,
     availableTemplate: config.availableEmailTemplateS3Object,
     fullyBookedTemplate: config.fullyBookedEmailTemplateS3Object,
+    endpoint: config.emailTemplateS3Endpoint,
   }));
   if (err) {
     logger.error(`An error occurred while fetching the email templates from S3: ${err.message}`);

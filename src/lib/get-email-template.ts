@@ -11,25 +11,27 @@ interface GetTemplatesParams {
   bucket: string,
   availableTemplate: string,
   fullyBookedTemplate: string,
+  endpoint?: string,
+  forcePathStyle?: boolean,
 }
 
 export const getEmailTemplates = async (params: GetTemplatesParams): Promise<EmailTemplates> => {
   const s3 = new AWS.S3({
-    region: params.awsRegion,
     apiVersion: '2006-03-01',
+    region: params.awsRegion,
+    endpoint: params.endpoint,
+    s3ForcePathStyle: params.forcePathStyle,
   });
   const results = await Promise.all([
     getEmailTemplate({
       s3,
       bucket: params.bucket,
       template: params.availableTemplate,
-      awsRegion: params.awsRegion,
     }),
     getEmailTemplate({
       s3,
       bucket: params.bucket,
       template: params.fullyBookedTemplate,
-      awsRegion: params.awsRegion,
     }),
   ]);
   return {
@@ -42,7 +44,6 @@ interface GetEmailTemplateParams {
   s3: AWS.S3,
   bucket: string,
   template: string,
-  awsRegion: string,
 }
 
 export const getEmailTemplate = async (params: GetEmailTemplateParams): Promise<string> => {
