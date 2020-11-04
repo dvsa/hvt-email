@@ -39,7 +39,6 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
   });
 };
 
-export const EMAIL_TEMPLATE = 'GOVNOTIFYTEMPLATE';
 export const EMAIL_SUBJECT = 'ATF Availability Confirmation';
 
 interface BuildSQSMessageParams {
@@ -47,6 +46,7 @@ interface BuildSQSMessageParams {
   atfId: string,
   atfEmail: string,
   templateValues: BuildEmailBodyParams,
+  templateId: string
 }
 
 export interface EmailMessageRequest {
@@ -64,11 +64,11 @@ export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequ
       MessageAttributes: {
         templateId: {
           DataType: 'String',
-          StringValue: EMAIL_TEMPLATE,
+          StringValue: params.templateId,
         },
         messageType: {
           DataType: 'String',
-          StringValue: 'Email',
+          StringValue: 'email',
         },
         recipient: {
           DataType: 'String',
