@@ -69,7 +69,7 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
           availableTemplate,
           fullyBookedTemplate,
           availability: newAvailability,
-          emailLinkBaseUrl: config.emailTemplateS3Bucket,
+          emailLinkBaseUrl: config.emailLinkBaseUrl,
         },
       });
       emailMessages.push(emailMessageRequest);
