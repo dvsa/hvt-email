@@ -113,6 +113,7 @@ describe('buildSqsMessage()', () => {
   it('builds an SQS message as expected', () => {
     const queueUrl = 'some-queue-url';
     const emailBody = 'some-email-body';
+    const templateId = '752d36a8-0fae-4177-80ad-20dd8bacc3e8';
     const availableTemplateRender = jest.fn().mockReturnValue(emailBody);
     const fullyBookedTemplateRender = jest.fn();
     const availableTemplate = {
@@ -132,6 +133,7 @@ describe('buildSqsMessage()', () => {
       queueUrl,
       atfId,
       atfEmail,
+      templateId,
       templateValues: {
         atfName,
         tokens,
@@ -150,11 +152,11 @@ describe('buildSqsMessage()', () => {
         MessageAttributes: {
           templateId: {
             DataType: 'String',
-            StringValue: 'GOVNOTIFYTEMPLATE',
+            StringValue: '752d36a8-0fae-4177-80ad-20dd8bacc3e8',
           },
           messageType: {
             DataType: 'String',
-            StringValue: 'Email',
+            StringValue: 'email',
           },
           recipient: {
             DataType: 'String',
