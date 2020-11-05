@@ -31,7 +31,7 @@ const tokens = {
 };
 const startDate = new Date(2020, 9, 21, 12, 0, 0).toISOString();
 const endDate = new Date(2020, 9, 27, 12, 0, 0).toISOString();
-const emailLinkBaseUrl = 'http://localhost/';
+const emailLinkBaseUrl = 'http://localhost';
 
 describe('buildEmailBody()', () => {
   const availableTemplateRender = jest.fn();
@@ -72,7 +72,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21/10/2020',
       additional_open_date_end: '27/10/2020',
-      no_link: `${emailLinkBaseUrl}?token=${tokens.no}`,
+      no_link: `${emailLinkBaseUrl}/update?token=${tokens.no}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(fullyBookedTemplate.render).toHaveBeenCalledTimes(0);
@@ -102,7 +102,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21/10/2020',
       additional_open_date_end: '27/10/2020',
-      yes_link: `${emailLinkBaseUrl}?token=${tokens.yes}`,
+      yes_link: `${emailLinkBaseUrl}/update?token=${tokens.yes}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(availableTemplate.render).toHaveBeenCalledTimes(0);

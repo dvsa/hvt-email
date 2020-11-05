@@ -26,7 +26,7 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
     : 'yes_link';
   const tokenKey = availability.isAvailable ? 'no' : 'yes';
   // eslint-disable-next-line security/detect-object-injection
-  const link = `${params.emailLinkBaseUrl}?${qs.stringify({ token: params.tokens[tokenKey] })}`;
+  const link = `${params.emailLinkBaseUrl}/update?${qs.stringify({ token: params.tokens[tokenKey] })}`;
 
   const startDate = new Date(availability.startDate);
   const endDate = new Date(availability.endDate);
