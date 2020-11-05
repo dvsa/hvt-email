@@ -21,10 +21,10 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
   const template = availability.isAvailable
     ? params.availableTemplate
     : params.fullyBookedTemplate;
-  const linkTemplateTag = availability
+  const linkTemplateTag = availability.isAvailable
     ? 'no_link'
     : 'yes_link';
-  const tokenKey = availability ? 'no' : 'yes';
+  const tokenKey = availability.isAvailable ? 'no' : 'yes';
   // eslint-disable-next-line security/detect-object-injection
   const link = `${params.emailLinkBaseUrl}?${qs.stringify({ token: params.tokens[tokenKey] })}`;
 

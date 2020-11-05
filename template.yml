@@ -2,19 +2,19 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Resources:
-    ConfirmationFunction:
-      Type: 'AWS::Serverless::Function'
-      Properties:
-        CodeUri: src/handler/
-        Handler: index.handler
-        Runtime: nodejs12.x
-        Events:
-          Stream:
-            Type: DynamoDB
-            Properties:
-              Stream: !GetAtt DynamoDBTable.StreamArn
-              BatchSize: 100
-              StartingPosition: TRIM_HORIZON
+  ConfirmationFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: src/handler/
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt DynamoDBTable.StreamArn
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
 
 DynamoDBTable:
   Type: AWS::DynamoDB::Table
