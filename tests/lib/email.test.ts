@@ -3,6 +3,7 @@ import type { Template } from 'nunjucks';
 import {
   buildEmailBody, buildSQSMessage, EmailMessageRequest, enqueueEmailMessages,
 } from '../../src/lib/email';
+import buildEmailSubject from '../../src/util/build-email-subject';
 import { Logger } from '../../src/util/logger';
 
 jest.unmock('light-date');
@@ -32,6 +33,9 @@ const tokens = {
 const startDate = new Date(2020, 9, 21, 12, 0, 0).toISOString();
 const endDate = new Date(2020, 9, 27, 12, 0, 0).toISOString();
 const emailLinkBaseUrl = 'http://localhost';
+const emailSubject = 'email-subject';
+
+jest.mock('../../src/util/build-email-subject', () => jest.fn(() => emailSubject));
 
 describe('buildEmailBody()', () => {
   const availableTemplateRender = jest.fn();
@@ -128,20 +132,21 @@ describe('buildSqsMessage()', () => {
       endDate,
       isAvailable: true, // some availability
     };
+    const templateValues = {
+      atfName,
+      tokens,
+      availableTemplate,
+      fullyBookedTemplate,
+      availability,
+      emailLinkBaseUrl,
+    };
 
     const result = buildSQSMessage({
       queueUrl,
       atfId,
       atfEmail,
       templateId,
-      templateValues: {
-        atfName,
-        tokens,
-        availableTemplate,
-        fullyBookedTemplate,
-        availability,
-        emailLinkBaseUrl,
-      },
+      templateValues,
     });
 
     expect(result).toEqual({
@@ -164,11 +169,12 @@ describe('buildSqsMessage()', () => {
           },
           subject: {
             DataType: 'String',
-            StringValue: 'ATF Availability Confirmation',
+            StringValue: emailSubject,
           },
         },
       },
     });
+    expect(buildEmailSubject).toHaveBeenCalledWith(templateValues);
   });
 });
 

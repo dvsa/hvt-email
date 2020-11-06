@@ -36,6 +36,6 @@ export const getConfig = (): Config => {
     queueUrl: process.env.SQS_QUEUE_URL,
     emailLinkBaseUrl: process.env.EMAIL_LINK_BASE_URL,
     nodeEnv: process.env.NODE_ENV,
-    templateId:process.env.NOTIFY_TEMPLATE_ID
+    templateId: process.env.NOTIFY_TEMPLATE_ID,
   };
 };
