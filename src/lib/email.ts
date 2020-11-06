@@ -1,6 +1,8 @@
 import qs from 'querystring';
 import AWS from 'aws-sdk';
 import { format, localeFormat } from 'light-date';
+import { subDays } from 'date-fns';
+
 import { Logger } from '../util/logger';
 import { BuildEmailBodyParams } from '../types';
 import buildEmailSubject from '../util/build-email-subject';
@@ -20,11 +22,12 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
 
   const startDate = new Date(availability.startDate);
   const endDate = new Date(availability.endDate);
+  const displayEndDate = subDays(endDate, 1);
 
   return template.render({
     atf_name: params.atfName,
     additional_open_date_start: format(startDate, `{dd} ${localeFormat(startDate, '{MMMM}')} {yyyy}`),
-    additional_open_date_end: format(endDate, `{dd} ${localeFormat(endDate, '{MMMM}')} {yyyy}`),
+    additional_open_date_end: format(displayEndDate, `{dd} ${localeFormat(displayEndDate, '{MMMM}')} {yyyy}`),
     [linkTemplateTag]: link,
   });
 };
