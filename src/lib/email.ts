@@ -1,6 +1,6 @@
 import qs from 'querystring';
 import AWS from 'aws-sdk';
-import { format } from 'light-date';
+import { format, localeFormat } from 'light-date';
 import { Logger } from '../util/logger';
 import { BuildEmailBodyParams } from '../types';
 import buildEmailSubject from '../util/build-email-subject';
@@ -23,8 +23,8 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
 
   return template.render({
     atf_name: params.atfName,
-    additional_open_date_start: format(startDate, '{dd}/{MM}/{yyyy}'),
-    additional_open_date_end: format(endDate, '{dd}/{MM}/{yyyy}'),
+    additional_open_date_start: format(startDate, `{dd} ${localeFormat(startDate, '{MMMM}')} {yyyy}`),
+    additional_open_date_end: format(endDate, `{dd} ${localeFormat(endDate, '{MMMM}')} {yyyy}`),
     [linkTemplateTag]: link,
   });
 };
