@@ -1,19 +1,9 @@
 import qs from 'querystring';
 import AWS from 'aws-sdk';
-import type { Template } from 'nunjucks';
 import { format } from 'light-date';
-
 import { Logger } from '../util/logger';
-import { Availability, TokenPair } from '../types';
-
-interface BuildEmailBodyParams {
-  availableTemplate: Template,
-  fullyBookedTemplate: Template,
-  atfName: string,
-  availability: Availability,
-  tokens: TokenPair,
-  emailLinkBaseUrl: string,
-}
+import { BuildEmailBodyParams } from '../types';
+import buildEmailSubject from '../util/build-email-subject';
 
 export const buildEmailBody = (params: BuildEmailBodyParams): string => {
   const { availability } = params;
@@ -38,8 +28,6 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
     [linkTemplateTag]: link,
   });
 };
-
-export const EMAIL_SUBJECT = 'ATF Availability Confirmation';
 
 interface BuildSQSMessageParams {
   queueUrl: string,
@@ -76,7 +64,7 @@ export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequ
         },
         subject: {
           DataType: 'String',
-          StringValue: EMAIL_SUBJECT,
+          StringValue: buildEmailSubject(params.templateValues),
         },
       },
     },
