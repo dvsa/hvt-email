@@ -7,7 +7,6 @@ import buildEmailSubject from '../../src/util/build-email-subject';
 import { Logger } from '../../src/util/logger';
 
 jest.unmock('light-date');
-jest.unmock('date-fns');
 jest.unmock('../../src/lib/email');
 
 jest.mock('aws-sdk', () => {
@@ -31,8 +30,8 @@ const tokens = {
   yes: 'some-yes-token',
   no: 'some-no-token',
 };
-const startDate = new Date('2020-10-19T00:00:00Z').toISOString();
-const endDate = new Date('2020-10-26T00:00:00Z').toISOString();
+const startDate = new Date(2020, 9, 21, 12, 0, 0).toISOString();
+const endDate = new Date(2020, 9, 27, 12, 0, 0).toISOString();
 const emailLinkBaseUrl = 'http://localhost';
 const emailSubject = 'email-subject';
 
@@ -75,8 +74,8 @@ describe('buildEmailBody()', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(availableTemplate.render).toHaveBeenCalledWith({
       atf_name: atfName,
-      additional_open_date_start: '19 October 2020',
-      additional_open_date_end: '25 October 2020',
+      additional_open_date_start: '21 October 2020',
+      additional_open_date_end: '27 October 2020',
       no_link: `${emailLinkBaseUrl}/update?token=${tokens.no}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -105,8 +104,8 @@ describe('buildEmailBody()', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(fullyBookedTemplate.render).toHaveBeenCalledWith({
       atf_name: atfName,
-      additional_open_date_start: '19 October 2020',
-      additional_open_date_end: '25 October 2020',
+      additional_open_date_start: '21 October 2020',
+      additional_open_date_end: '27 October 2020',
       yes_link: `${emailLinkBaseUrl}/update?token=${tokens.yes}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
