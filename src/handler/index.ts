@@ -65,7 +65,7 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
         templateId: config.templateId,
         templateValues: {
           atfName: availabilityData.name,
-          tokens: availabilityData.tokens,
+          token: availabilityData.token,
           availableTemplate,
           fullyBookedTemplate,
           availability: newAvailability,
