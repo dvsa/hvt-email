@@ -7,16 +7,11 @@ export interface Availability {
   isAvailable: boolean,
 }
 
-export interface TokenPair {
-  yes: string,
-  no: string,
-}
-
 export interface ATF {
   id: string,
   name: string,
   email: string,
-  tokens: TokenPair,
+  token: string,
   [key: string]: unknown,
 }
 
@@ -30,6 +25,6 @@ export interface BuildEmailBodyParams {
   fullyBookedTemplate: Template,
   atfName: string,
   availability: Availability,
-  tokens: TokenPair,
+  token: string,
   emailLinkBaseUrl: string,
 }

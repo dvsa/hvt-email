@@ -14,9 +14,7 @@ jest.unmock('deep-equal');
 describe('extractAvailabilityData()', () => {
   it('extracts the availability data as expected', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const yesToken = validEvent.NewImage.tokens.M.yes.S;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const noToken = validEvent.NewImage.tokens.M.no.S;
+    const token = validEvent.NewImage.token.S;
     const testCases = [
       {
         record: {
@@ -26,10 +24,7 @@ describe('extractAvailabilityData()', () => {
           id: '7db12eed-0c3f-4d27-8221-5699f4e3ea22',
           name: 'Derby Cars Ltd.',
           email: 'hello@email.com',
-          tokens: {
-            yes: yesToken,
-            no: noToken,
-          },
+          token,
           oldAvailability: {
             isAvailable: false,
             lastUpdated: '2020-10-09T12:31:46.518Z',

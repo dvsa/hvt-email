@@ -26,10 +26,7 @@ const awsSdkModuleMock = AWS as jest.Mocked<typeof AWS> & { sqsSendMessageMock: 
 const atfId = 'some-atf-id';
 const atfName = 'some-atf-name';
 const atfEmail = 'some-atf-email';
-const tokens = {
-  yes: 'some-yes-token',
-  no: 'some-no-token',
-};
+const token = 'some-token';
 const startDate = new Date(2020, 9, 21, 12, 0, 0).toISOString();
 const endDate = new Date(2020, 9, 27, 12, 0, 0).toISOString();
 const emailLinkBaseUrl = 'http://localhost';
@@ -65,7 +62,7 @@ describe('buildEmailBody()', () => {
       fullyBookedTemplate,
       atfName,
       availability,
-      tokens,
+      token,
       emailLinkBaseUrl,
     });
 
@@ -76,7 +73,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21 October 2020',
       additional_open_date_end: '27 October 2020',
-      no_link: `${emailLinkBaseUrl}/update?token=${tokens.no}`,
+      link: `${emailLinkBaseUrl}/update?token=${token}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(fullyBookedTemplate.render).toHaveBeenCalledTimes(0);
@@ -95,7 +92,7 @@ describe('buildEmailBody()', () => {
       fullyBookedTemplate,
       atfName,
       availability,
-      tokens,
+      token,
       emailLinkBaseUrl,
     });
 
@@ -106,7 +103,7 @@ describe('buildEmailBody()', () => {
       atf_name: atfName,
       additional_open_date_start: '21 October 2020',
       additional_open_date_end: '27 October 2020',
-      yes_link: `${emailLinkBaseUrl}/update?token=${tokens.yes}`,
+      link: `${emailLinkBaseUrl}/update?token=${token}`,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(availableTemplate.render).toHaveBeenCalledTimes(0);
@@ -134,7 +131,7 @@ describe('buildSqsMessage()', () => {
     };
     const templateValues = {
       atfName,
-      tokens,
+      token,
       availableTemplate,
       fullyBookedTemplate,
       availability,

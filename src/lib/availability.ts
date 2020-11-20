@@ -3,16 +3,13 @@ import type { DynamoDBRecord } from 'aws-lambda';
 import deepEqual from 'deep-equal';
 import Joi from 'joi';
 
-import { Availability, AvailabilityChangeData, TokenPair } from '../types';
+import { Availability, AvailabilityChangeData } from '../types';
 
 const atfSchema = Joi.object({
   id: Joi.string().uuid().required(),
   name: Joi.string().required(),
   email: Joi.string().email().required(),
-  tokens: Joi.object({
-    yes: Joi.string().required(),
-    no: Joi.string().required(),
-  }),
+  token: Joi.string().required(),
 }).unknown(true);
 
 const availabilitySchema = Joi.object({
@@ -32,7 +29,7 @@ export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityCha
   }
 
   const {
-    id, name, email, tokens, availability: newAvailability,
+    id, name, email, token, availability: newAvailability,
   } = newImage;
   const { availability: oldAvailability } = oldImage;
   const newAvailabilityValResult = availabilitySchema.validate(newAvailability);
@@ -44,7 +41,7 @@ export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityCha
     id: id as string,
     name: name as string,
     email: email as string,
-    tokens: tokens as TokenPair,
+    token: token as string,
     oldAvailability: oldAvailability as Availability,
     newAvailability: newImage.availability as Availability,
   };

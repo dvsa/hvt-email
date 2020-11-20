@@ -38,15 +38,8 @@
               }
             }
           },
-          "tokens": {
-            "M": {
-              "yes": {
-                "S": "eyJhbGciOiJIUzI1Ni..."
-              },
-              "no": {
-                "S": "eyJhbGciOiJIUzI1Ni..."
-              }
-            }
+          "token": {
+            "S": "eyJhbGciOiJIUzI1Ni..."
           }
         },
         "OldImage": {
@@ -75,15 +68,8 @@
               }
             }
           },
-          "tokens": {
-            "M": {
-              "yes": {
-                "S": "eyJhbGciOiJIUzI1Ni..."
-              },
-              "no": {
-                "S": "eyJhbGciOiJIUzI1Ni..."
-              }
-            }
+          "token": {
+            "S": "eyJhbGciOiJIUzI1Ni..."
           }
         },
         "ApproximateCreationDateTime": 1428537600,
