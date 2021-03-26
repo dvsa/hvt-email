@@ -16,8 +16,7 @@ export interface ATF {
 }
 
 export type AvailabilityChangeData = {
-  oldAvailability?: Availability,
-  newAvailability?: Availability,
+  availability: Availability,
 } & ATF;
 
 export interface BuildEmailBodyParams {

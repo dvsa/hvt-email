@@ -4,7 +4,7 @@ const common = require('./webpack.common.js');
 const archiver = require('archiver');
 const branchName = require('current-git-branch');
 
-const LAMBDA_NAME = 'ConfirmationFunction';
+const LAMBDA_NAME = 'EmailConfirmationFunction';
 const OUTPUT_FOLDER = './dist'
 const BUILD_VERSION = branchName().replace("/","-");
 

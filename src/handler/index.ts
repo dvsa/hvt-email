@@ -1,15 +1,15 @@
 import 'dotenv/config';
-import type { Context, DynamoDBStreamEvent } from 'aws-lambda';
 
+import type { Context, SQSEvent } from 'aws-lambda';
 import { getConfig } from '../lib/config';
-import { availabilityHasChanged, extractAvailabilityData } from '../lib/availability';
+import { validateAvailabilityData } from '../lib/availability';
 import { getEmailTemplates } from '../lib/get-email-template';
 import { buildSQSMessage, enqueueEmailMessages, EmailMessageRequest } from '../lib/email';
 import handle from '../util/handle-await-error';
 import { createLogger, Logger } from '../util/logger';
 import { AvailabilityChangeData } from '../types';
 
-export const handler = async (event: DynamoDBStreamEvent, context: Context): Promise<void> => {
+export const handler = async (event: SQSEvent, context: Context): Promise<void> => {
   const logger: Logger = createLogger(null, context);
   logger.info('Confirmation email lambda triggered.');
 
@@ -35,45 +35,43 @@ export const handler = async (event: DynamoDBStreamEvent, context: Context): Pro
   const emailMessages: EmailMessageRequest[] = [];
   logger.info(`Received ${records.length} records from DynamoDB.`);
   records.forEach((record) => {
-    // Discard INSERT and REMOVE events
-    if (record.eventName !== 'MODIFY') {
-      logger.info(`Discarding ${record.eventName} event.`);
+    logger.debug(`Processing record: ${JSON.stringify(record)}`);
+
+    let message: AvailabilityChangeData;
+    try {
+      const body: Record<string, string> = <Record<string, string>> JSON.parse(record.body);
+      message = JSON.parse(body.Message) as AvailabilityChangeData;
+    } catch (parseError) {
+      logger.error(`Error while parsing message body for messageId: ${record.messageId}`);
+      logger.error(parseError);
       return;
     }
-
-    logger.debug(`Processing record: ${JSON.stringify(record)}`);
 
     // Extract data from event
     let availabilityData: AvailabilityChangeData;
     try {
-      availabilityData = extractAvailabilityData(record);
+      availabilityData = validateAvailabilityData(message);
     } catch (err2) {
       logger.error((err2 as Error).message);
       return; // skip to next record
     }
-    const {
-      oldAvailability,
-      newAvailability,
-    } = availabilityData;
+    const { availability } = availabilityData;
 
-    // Any changes we're actually concerned about?
-    if (availabilityHasChanged(oldAvailability, newAvailability)) {
-      const emailMessageRequest = buildSQSMessage({
-        queueUrl: config.queueUrl,
-        atfId: availabilityData.id,
-        atfEmail: availabilityData.email,
-        templateId: config.templateId,
-        templateValues: {
-          atfName: availabilityData.name,
-          token: availabilityData.token,
-          availableTemplate,
-          fullyBookedTemplate,
-          availability: newAvailability,
-          emailLinkBaseUrl: config.emailLinkBaseUrl,
-        },
-      });
-      emailMessages.push(emailMessageRequest);
-    }
+    const emailMessageRequest = buildSQSMessage({
+      queueUrl: config.queueUrl,
+      atfId: availabilityData.id,
+      atfEmail: availabilityData.email,
+      templateId: config.templateId,
+      templateValues: {
+        atfName: availabilityData.name,
+        token: availabilityData.token,
+        availableTemplate,
+        fullyBookedTemplate,
+        availability,
+        emailLinkBaseUrl: config.emailLinkBaseUrl,
+      },
+    });
+    emailMessages.push(emailMessageRequest);
   });
 
   if (emailMessages.length) {
