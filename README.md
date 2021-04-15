@@ -1,7 +1,7 @@
 # hvt-email
 
 
-A Serverless Node lambda (ConfirmationFunction) for sending a confirmation email to an ATF when they update their availability.
+A Serverless Node lambda (EmailConfirmationFunction) for sending a confirmation email to an ATF when they update their availability.
 
 **Note:** This lambda doesn't expose any API endpoint. As a consequence, it doesn't make
 sense to start it with `sam local start-api` at development time. If you need to, you
@@ -27,7 +27,7 @@ sent to the lambda by editing the file `events/event.json`.
 
 1. Run lambdas in debug mode: `npm run start:dev -- -d 5858`
 1. Add a breakpoint to the lambda being tested (`src/handler/index.ts`)
-1. Run the debug config from VS Code that corresponds to lambda being tested (`ConfirmationFunction`)
+1. Run the debug config from VS Code that corresponds to lambda being tested (`EmailConfirmationFunction`)
 1. `npm run invoke`
 
 

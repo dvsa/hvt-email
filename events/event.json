@@ -1,83 +1,16 @@
 {
   "Records": [
     {
-      "eventID": "c81e728d9d4c2f636f067f89cc14862c",
-      "eventName": "MODIFY",
-      "eventVersion": "1.1",
-      "eventSource": "aws:dynamodb",
-      "awsRegion": "eu-west-2",
-      "dynamodb": {
-        "Keys": {
-          "id": {
-            "S": "7db12eed-0c3f-4d27-8221-5699f4e3ea22"
-          }
-        },
-        "NewImage": {
-          "id": {
-            "S": "7db12eed-0c3f-4d27-8221-5699f4e3ea22"
-          },
-          "name": {
-            "S": "Derby Cars Ltd."
-          },
-          "email": {
-            "S": "hello@email.com"
-          },
-          "availability": {
-            "M": {
-              "isAvailable": {
-                "BOOL": true
-              },
-              "lastUpdated": {
-                "S": "2020-10-09T12:31:46.518Z"
-              },
-              "endDate": {
-                "S": "2020-11-03T14:21:45.000Z"
-              },
-              "startDate": {
-                "S": "2020-10-06T14:21:45.000Z"
-              }
-            }
-          },
-          "token": {
-            "S": "eyJhbGciOiJIUzI1Ni..."
-          }
-        },
-        "OldImage": {
-          "id": {
-            "S": "7db12eed-0c3f-4d27-8221-5699f4e3ea22"
-          },
-          "name": {
-            "S": "Derby Cars Ltd."
-          },
-          "email": {
-            "S": "hello@email.com"
-          },
-          "availability": {
-            "M": {
-              "isAvailable": {
-                "BOOL": false
-              },
-              "lastUpdated": {
-                "S": "2020-10-09T12:31:46.518Z"
-              },
-              "endDate": {
-                "S": "2020-11-03T14:21:45.000Z"
-              },
-              "startDate": {
-                "S": "2020-10-06T14:21:45.000Z"
-              }
-            }
-          },
-          "token": {
-            "S": "eyJhbGciOiJIUzI1Ni..."
-          }
-        },
-        "ApproximateCreationDateTime": 1428537600,
-        "SequenceNumber": "4421584500000000017450439092",
-        "SizeBytes": 59,
-        "StreamViewType": "NEW_AND_OLD_IMAGES"
-      },
-      "eventSourceARN": "arn:aws:dynamodb:eu-west-2:123456789012:table/AuthorisedTestingFacilities/stream/2015-06-27T00:48:05.899"
+      "messageId": "4f80239a-03c9-4fce-d68a-104001cbc5cb",
+      "receiptHandle": "gvjxhsgayqxjneypkfnbfyvnvoeajirwkwlgmoioigyqijuqaembinhjsrkpaxvyhpgrkkzfoadwmttnqmcexwougjbuhhikmkiuxnzeqhzkwtwfacjdmmlcwdtmgkhytlmapuodsxewfqfkfyabwypmwabrgneyzqdfzstnzdrsdhpfzygvtzbhh",
+      "mD5OfBody": "fb4823f6e5532530878d696331b20f3c",
+      "body": "{\"Type\": \"Notification\", \"MessageId\": \"b5c987c9-508b-416d-aff9-38fd81c4fb73\", \"Token\": null, \"TopicArn\": \"arn:aws:sns:eu-west-1:000000000000:hvt-sns-availability-history-topic\", \"Message\": \"{\\\"id\\\":\\\"7db12eed-0c3f-4d27-8221-5699f4e3ea22\\\",\\\"name\\\":\\\"Derby Cars Ltd.\\\",\\\"email\\\":\\\"hello@email.com\\\",\\\"availability\\\":{\\\"isAvailable\\\":false,\\\"lastUpdated\\\":\\\"2020-10-09T12:31:46.518Z\\\",\\\"endDate\\\":\\\"2020-11-03T14:21:45.000Z\\\",\\\"startDate\\\":\\\"2020-10-06T14:21:45.000Z\\\"},\\\"token\\\":\\\"eyJhbGciOiJIUzI1Ni...\\\"}\", \"SubscribeURL\": null, \"Timestamp\": \"2021-03-25T11:41:45.511Z\", \"SignatureVersion\": \"1\", \"Signature\": \"EXAMPLEpH+..\", \"SigningCertURL\": \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-0000000000000000000000.pem\", \"Subject\": \"New AvailabilityHistory message sent to SNS\"}",
+      "attributes": {
+        "SenderId": "AIDAIT2UOQQY3AUEKVGXU",
+        "SentTimestamp": "1616672505599",
+        "ApproximateReceiveCount": "1",
+        "ApproximateFirstReceiveTimestamp": "1616672530339"
+      }
     }
   ]
 }

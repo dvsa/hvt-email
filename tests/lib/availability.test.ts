@@ -1,215 +1,123 @@
-import type { DynamoDBRecord, StreamRecord } from 'aws-lambda';
-
-import { extractAvailabilityData, availabilityHasChanged } from '../../src/lib/availability';
-
-import validEvent from '../mocks/dynamodb-stream-event.json';
-import eventWithInvalidEmail from '../mocks/invalid-dynamodb-stream-event-email.json';
-import eventWithInvalidAvailability from '../mocks/invalid-dynamodb-stream-event-availability.json';
+import { validateAvailabilityData } from '../../src/lib/availability';
+import { AvailabilityChangeData } from '../../src/types';
 
 jest.unmock('../../src/lib/availability');
-jest.unmock('aws-sdk');
 jest.unmock('joi');
-jest.unmock('deep-equal');
 
-describe('extractAvailabilityData()', () => {
-  it('extracts the availability data as expected', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const token = validEvent.NewImage.token.S;
-    const testCases = [
-      {
-        record: {
-          dynamodb: validEvent as StreamRecord,
-        } as DynamoDBRecord,
-        expected: {
-          id: '7db12eed-0c3f-4d27-8221-5699f4e3ea22',
-          name: 'Derby Cars Ltd.',
-          email: 'hello@email.com',
-          token,
-          oldAvailability: {
-            isAvailable: false,
-            lastUpdated: '2020-10-09T12:31:46.518Z',
-            endDate: '2020-11-03T14:21:45.000Z',
-            startDate: '2020-10-06T14:21:45.000Z',
-          },
-          newAvailability: {
-            isAvailable: true,
-            lastUpdated: '2020-10-09T12:31:46.518Z',
-            endDate: '2020-11-03T14:21:45.000Z',
-            startDate: '2020-10-06T14:21:45.000Z',
-          },
-        },
+describe('validateAvailabilityData()', () => {
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFydERhdGUiOjE2MDI4NzM0NjQsImVuZERhdGU'
+      + 'iOjE2MDUyOTI2NjQsImlzQXZhaWxhYmxlIjp0cnVlLCJpYXQiOjE2MDI4NzM0NjQsImV4cCI6MTYwMzQ3ODI2NCwiaX'
+      + 'NzIjoiaHR0cHM6Ly9ib29rLWhndi1idXMtdHJhaWxlci1tb3Quc2VydmljZS5nb3YudWsiLCJzdWIiOiJlMWQ4NzgxO'
+      + 'C00YTk3LTQ4NmItYmU4NS1mZDFlY2U4MGJjMzAifQ.-RLsz-87tLDMhLopcJq4wyXs0ySLUd9PzGhmzAtUt8k';
+  let testCase: AvailabilityChangeData;
+
+  beforeEach(() => {
+    testCase = {
+      id: '7db12eed-0c3f-4d27-8221-5699f4e3ea22',
+      name: 'Derby Cars Ltd.',
+      email: 'hello@email.com',
+      token,
+      availability: {
+        isAvailable: true,
+        lastUpdated: '2020-10-09T12:31:46.518Z',
+        endDate: '2020-11-03T14:21:45.000Z',
+        startDate: '2020-10-06T14:21:45.000Z',
       },
-    ];
-
-    testCases.forEach(({ record, expected }) => {
-      expect(extractAvailabilityData(record)).toEqual(expected);
-    });
+    };
   });
 
-  it('detects when the ATF is in an unexpected format', () => {
-    const testCase = {
-      record: {
-        dynamodb: eventWithInvalidEmail as StreamRecord,
-      } as DynamoDBRecord,
-    };
+  it('returns the availability data as expected if validation passes', () => {
+    expect(validateAvailabilityData(testCase)).toEqual(testCase);
+  });
 
+  it('detects when the ATF email is in an unexpected format', () => {
+    testCase.email = '### INVALID EMAIL ADDRESS ###';
     expect(() => {
-      extractAvailabilityData(testCase.record);
+      validateAvailabilityData(testCase);
     }).toThrowError();
   });
 
-  it('detects when the availability data is in an unexpected format', () => {
-    const testCase = {
-      record: {
-        dynamodb: eventWithInvalidAvailability as StreamRecord,
-      } as DynamoDBRecord,
-    };
-
+  it('detects when the ATF ID is in an unexpected format', () => {
+    testCase.id = '1a7c1d1a-8e52-11eb-8dcd-0242ac1300034'; // invalid uuid
     expect(() => {
-      extractAvailabilityData(testCase.record);
+      validateAvailabilityData(testCase);
     }).toThrowError();
   });
-});
 
-describe('availabilityHasChanged()', () => {
-  it('detects when availability has changed', () => {
-    const testCases = [
-      // false → true
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-        newAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: true,
-        },
-      },
-      // true → false
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: true,
-        },
-        newAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-      },
-      // true → true, different dates
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: true,
-        },
-        newAvailability: {
-          lastUpdated: '2020-11-19T16:01:28.832Z',
-          startDate: '2020-11-19T16:01:28.832Z',
-          endDate: '2020-11-26T16:01:28.832Z',
-          isAvailable: true,
-        },
-      },
-      // false → false, different dates
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-        newAvailability: {
-          lastUpdated: '2020-11-19T16:01:28.832Z',
-          startDate: '2020-11-19T16:01:28.832Z',
-          endDate: '2020-11-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-      },
-    ];
-
-    testCases.forEach(({ oldAvailability, newAvailability }) => {
-      expect(availabilityHasChanged(oldAvailability, newAvailability)).toEqual(true);
-    });
+  it('detects when the ATF ID is missing', () => {
+    delete testCase.id;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
   });
 
-  it('detects when availability has not changed', () => {
-    const testCases = [
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-        newAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-      },
-    ];
-
-    testCases.forEach(({ oldAvailability, newAvailability }) => {
-      expect(availabilityHasChanged(oldAvailability, newAvailability)).toEqual(false);
-    });
+  it('detects when the ATF name is missing', () => {
+    delete testCase.name;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
   });
 
-  it('detects when availability data was deleted', () => {
-    const testCases = [
-      {
-        oldAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-        newAvailability: undefined,
-      },
-    ];
-
-    testCases.forEach(({ oldAvailability, newAvailability }) => {
-      expect(availabilityHasChanged(oldAvailability, newAvailability)).toEqual(false);
-    });
+  it('detects when the ATF email is missing', () => {
+    delete testCase.email;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
   });
 
-  it('detects when availability data is added for the first time', () => {
-    const testCases = [
-      {
-        oldAvailability: undefined,
-        newAvailability: {
-          lastUpdated: '2020-10-19T16:01:28.832Z',
-          startDate: '2020-10-19T16:01:28.832Z',
-          endDate: '2020-10-26T16:01:28.832Z',
-          isAvailable: false,
-        },
-      },
-    ];
-
-    testCases.forEach(({ oldAvailability, newAvailability }) => {
-      expect(availabilityHasChanged(oldAvailability, newAvailability)).toEqual(true);
-    });
+  it('detects when the ATF token is missing', () => {
+    delete testCase.token;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
   });
 
-  it('ignores changes to items with no availability data before and after the change', () => {
-    const testCases = [
-      {
-        oldAvailability: undefined,
-        newAvailability: undefined,
-      },
-    ];
+  it('detects when the ATF availability last updated is in an unexpected format', () => {
+    testCase.availability.lastUpdated = 'Monday';
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
 
-    testCases.forEach(({ oldAvailability, newAvailability }) => {
-      expect(availabilityHasChanged(oldAvailability, newAvailability)).toEqual(false);
-    });
+  it('detects when the ATF availability last updated is missing', () => {
+    delete testCase.availability.lastUpdated;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
+
+  it('detects when the ATF availability end date is in an unexpected format', () => {
+    testCase.availability.endDate = 'Monday';
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
+
+  it('detects when the ATF availability end date is missing', () => {
+    delete testCase.availability.endDate;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
+
+  it('detects when the ATF availability start date is in an unexpected format', () => {
+    testCase.availability.startDate = 'Monday';
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
+
+  it('detects when the ATF availability start date is missing', () => {
+    delete testCase.availability.startDate;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
+  });
+
+  it('detects when the ATF availability start date is missing', () => {
+    delete testCase.availability.isAvailable;
+    expect(() => {
+      validateAvailabilityData(testCase);
+    }).toThrowError();
   });
 });
