@@ -24,7 +24,7 @@ export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityCha
   const newImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
 
   const newImageValResult = atfSchema.validate(newImage);
-  if (newImageValResult.error || newImageValResult.errors) {
+  if (newImageValResult.error) {
     throw new Error(`Marlformed rercord: ${JSON.stringify(newImage)}`);
   }
 
@@ -33,7 +33,7 @@ export const extractAvailabilityData = (record: DynamoDBRecord): AvailabilityCha
   } = newImage;
   const { availability: oldAvailability } = oldImage;
   const newAvailabilityValResult = availabilitySchema.validate(newAvailability);
-  if (newAvailabilityValResult.error || newAvailabilityValResult.errors) {
+  if (newAvailabilityValResult.error) {
     throw new Error(`Malformed "availability" field in: ${JSON.stringify(newImage)}`);
   }
 
