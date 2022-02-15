@@ -14,8 +14,6 @@ export const buildEmailBody = (params: BuildEmailBodyParams): string => {
   const linkTemplateTag = availability.isAvailable
     ? 'link'
     : 'link';
-  const tokenKey = availability.isAvailable ? 'no' : 'yes';
-  // eslint-disable-next-line security/detect-object-injection
   const link = `${params.emailLinkBaseUrl}/update?${qs.stringify({ token: params.token })}`;
 
   const startDate = new Date(availability.startDate);
