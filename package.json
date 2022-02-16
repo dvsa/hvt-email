@@ -19,7 +19,7 @@
   ],
   "license": "UNLICENSED",
   "dependencies": {
-    "aws-sdk": "^2.747.0",
+    "aws-sdk": "^2.1062.0",
     "deep-equal": "^2.0.4",
     "dotenv": "^8.2.0",
     "joi": "^17.2.1",
