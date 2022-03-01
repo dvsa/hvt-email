@@ -17,7 +17,7 @@ const availabilitySchema = Joi.object({
 
 export const validateAvailabilityData = (message: AvailabilityChangeData): AvailabilityChangeData => {
   const validationResult = atfSchema.validate(message);
-  if (validationResult.error || validationResult.errors) {
+  if (validationResult.error) {
     throw new Error(`Malformed record: ${JSON.stringify(message)}`);
   }
 
@@ -25,7 +25,7 @@ export const validateAvailabilityData = (message: AvailabilityChangeData): Avail
     id, name, email, token, availability,
   } = message;
   const availabilityValidationResult = availabilitySchema.validate(availability);
-  if (availabilityValidationResult.error || availabilityValidationResult.errors) {
+  if (availabilityValidationResult.error) {
     throw new Error(`Malformed "availability" field in: ${JSON.stringify(message)}`);
   }
 
