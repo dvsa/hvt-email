@@ -114,7 +114,7 @@ describe('validateAvailabilityData()', () => {
     }).toThrowError();
   });
 
-  it('detects when the ATF availability start date is missing', () => {
+  it('detects when the ATF availability boolean is missing', () => {
     delete testCase.availability.isAvailable;
     expect(() => {
       validateAvailabilityData(testCase);

@@ -22,7 +22,7 @@ export const getConfig = (): Config => {
     'EMAIL_LINK_BASE_URL',
     'NODE_ENV',
     'NOTIFY_TEMPLATE_ID',
-    'MYVT_URL'
+    'MYVT_URL',
   ].forEach((envVar) => {
     if (!process.env[`${envVar}`]) {
       throw new Error(`Environment variable ${envVar} seems to be missing.`);

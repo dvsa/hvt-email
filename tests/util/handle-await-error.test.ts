@@ -9,7 +9,7 @@ describe('handle await error', () => {
 
     const [err, actual] = await handle(promise);
 
-    expect(err).toBe(undefined);
+    expect(err).toBeUndefined();
     expect(actual).toEqual(expected);
   });
 
@@ -20,6 +20,6 @@ describe('handle await error', () => {
     const [actualError, val] = await handle(promise);
 
     expect(actualError).toEqual(expectedError);
-    expect(val).toBe(undefined);
+    expect(val).toBeUndefined();
   });
 });

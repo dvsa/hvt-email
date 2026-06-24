@@ -59,7 +59,7 @@ export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequ
         },
         subject: {
           DataType: 'String',
-          StringValue: "Update your test availability",
+          StringValue: 'Update your test availability',
           // StringValue: buildEmailSubject(params.templateValues),
         },
       },

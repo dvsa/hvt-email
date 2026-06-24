@@ -5,7 +5,7 @@ jest.unmock('light-date');
 jest.unmock('../../src/util/build-email-subject');
 
 describe('build email subject', () => {
-  it('it builds proper message when availability is set to true', () => {
+  it('builds proper message when availability is set to true', () => {
     const params: BuildEmailBodyParams = {
       atfName: 'Some ATF name',
       availability: {
@@ -20,7 +20,7 @@ describe('build email subject', () => {
     );
   });
 
-  it('it builds proper message when availability is set to false', () => {
+  it('builds proper message when availability is set to false', () => {
     const params: BuildEmailBodyParams = {
       atfName: 'Some ATF name',
       availability: {
