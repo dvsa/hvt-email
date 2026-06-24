@@ -34,6 +34,8 @@ jobs:
       
       - run: npm run build:prod
 
+      - run: ls -la dist/
+
       - uses: actions/upload-artifact@v6
         with:
           name: hvt-email-${{ github.run_id }}
