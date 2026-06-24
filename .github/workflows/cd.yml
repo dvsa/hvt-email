@@ -1,0 +1,40 @@
+name: cd
+
+on:
+  push:
+    branches:
+      - feat/*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    environment: int
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 18.16.0
+
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role"
+          role-session-name: "hvt-email-${{ github.run_id }}"
+
+      - run: aws secretsmanager get-secret-value --secret-id ${{ secrets.CONFIG_SECRET }} --query SecretString --output text > .env
+      
+      - run: npm run build:prod
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: hvt-email-${{ github.run_id }}
+          path: dist/

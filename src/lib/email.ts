@@ -8,13 +8,10 @@ import buildEmailSubject from '../util/build-email-subject';
 export const buildEmailBody = (params: BuildEmailBodyParams): string => {
   const { availability } = params;
 
-  const template = availability.isAvailable
-    ? params.availableTemplate
-    : params.fullyBookedTemplate;
-  const linkTemplateTag = availability.isAvailable
-    ? 'link'
-    : 'link';
-  const link = `${params.emailLinkBaseUrl}/update?${qs.stringify({ token: params.token })}`;
+  const template = availability.isAvailable ? params.availableTemplate : params.fullyBookedTemplate;
+  const linkTemplateTag = availability.isAvailable ? 'link' : 'link';
+
+  const link = process.env.MYVT_URL;
 
   const startDate = new Date(availability.startDate);
   const endDate = new Date(availability.endDate);
@@ -62,7 +59,8 @@ export const buildSQSMessage = (params: BuildSQSMessageParams): EmailMessageRequ
         },
         subject: {
           DataType: 'String',
-          StringValue: buildEmailSubject(params.templateValues),
+          StringValue: "Update your test availability",
+          // StringValue: buildEmailSubject(params.templateValues),
         },
       },
     },
