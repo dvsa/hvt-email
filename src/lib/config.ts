@@ -9,6 +9,7 @@ interface Config {
   emailLinkBaseUrl: string,
   nodeEnv: string,
   templateId: string,
+  myvtUrl: string,
 }
 
 export const getConfig = (): Config => {
