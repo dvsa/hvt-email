@@ -21,6 +21,7 @@ export const getConfig = (): Config => {
     'EMAIL_LINK_BASE_URL',
     'NODE_ENV',
     'NOTIFY_TEMPLATE_ID',
+    'MYVT_URL'
   ].forEach((envVar) => {
     if (!process.env[`${envVar}`]) {
       throw new Error(`Environment variable ${envVar} seems to be missing.`);
@@ -37,5 +38,6 @@ export const getConfig = (): Config => {
     emailLinkBaseUrl: process.env.EMAIL_LINK_BASE_URL,
     nodeEnv: process.env.NODE_ENV,
     templateId: process.env.NOTIFY_TEMPLATE_ID,
+    myvtUrl: process.env.MYVT_URL,
   };
 };
